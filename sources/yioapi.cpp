@@ -707,8 +707,10 @@ void YioAPI::processMessage(QString message) {
             } else if (type == "set_dark_mode") {
                 /// Set dark mode
                 apiSettingsSetDarkMode(client, id, map);
+            } else if (type == "log") {
+                /// Logger control
+                apiLoggerControl(client, id, map);
             }
-
         } else {
             QVariantMap response;
             qCWarning(CLASS_LC) << "Client not authenticated";
@@ -1461,5 +1463,104 @@ void YioAPI::apiSettingsSetDarkMode(QWebSocket *client, const int &id, const QVa
         apiSendResponse(client, id, true, response);
     } else {
         apiSendResponse(client, id, false, response);
+    }
+}
+
+void YioAPI::apiLoggerControl(QWebSocket* client, const int& id, const QVariantMap& map) {
+    // Handle log
+    QVariantMap response;
+    Logger* logger = Logger::getInstance();
+    QString logAction = map["action"].toString();
+    QString logTarget = map["target"].toString();
+    qCDebug(CLASS_LC) << "YioAPI LOGGER : " << logAction;
+    if (logAction == "start") {
+        // enable logger target, default is queue
+        if (logTarget == "file")
+            logger->setFileEnabled(true);
+        else if (logTarget == "console")
+            logger->setConsoleEnabled(true);
+        else
+            logger->setQueueEnabled(true);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "stop") {
+        // disable logger queue target, default is queue
+        if (logTarget == "file")
+            logger->setFileEnabled(false);
+        else if (logTarget == "console")
+            logger->setConsoleEnabled(false);
+        else
+            logger->setQueueEnabled(false);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "showsource") {
+        // show source position in log line
+        logger->setShowSourcePos(true);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "hidesource") {
+        // hide source position in log line
+        logger->setShowSourcePos(false);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "purge") {
+        // purge log files
+        int hours = 24;
+        if (map.contains("hours"))
+            hours = map["hours"].toInt();
+        logger->purgeFiles(hours);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "setloglevel") {
+        // set log level
+        int level = QtMsgType::QtDebugMsg;
+        QString category;
+        if (map.contains("level"))
+            level = logger->toMsgType(map["level"].toString());
+        if (map.contains("category")) {
+            category = map["category"].toString();
+            logger->setCategoryLogLevel(category, level);
+        }
+        else
+            logger->setLogLevel(level);
+        apiSendResponse(client, id, true, response);
+    }
+    else if (logAction == "getmessages") {
+        // get log messages
+        int count = 50;
+        int level = QtMsgType::QtDebugMsg;
+        QStringList categories;
+        if (map.contains("count"))
+            count = map["count"].toInt();
+        if (map.contains("level"))
+            level = logger->toMsgType(map["level"].toString());
+        if (map.contains("categories"))
+            categories = map["categories"].toStringList();
+        QJsonArray messages = logger->getQueuedMessages(count, level, categories);
+        QJsonObject jsonObj;
+        jsonObj.insert("id", id);
+        jsonObj.insert("success", true);
+        jsonObj.insert("type", "result");
+        jsonObj.insert("messages", messages);
+        QJsonDocument json = QJsonDocument(jsonObj);
+        if (client && m_clients.contains(client) && client->isValid()) {
+            client->sendTextMessage(json.toJson(QJsonDocument::JsonFormat::Compact));
+        }
+    }
+    else if (logAction == "getinfo") {
+        // get log info
+        QJsonObject info = logger->getInformation();
+        QJsonObject jsonObj;
+        jsonObj.insert("id", id);
+        jsonObj.insert("success", true);
+        jsonObj.insert("type", "result");
+        jsonObj.insert("info", info);
+        QJsonDocument json = QJsonDocument(jsonObj);
+        if (client && m_clients.contains(client) && client->isValid()) {
+            client->sendTextMessage(json.toJson(QJsonDocument::JsonFormat::Compact));
+        }
+    }
+    else {
+        qCWarning(CLASS_LC) << "YioAPI Bad LOGGER Action : " << logAction;
     }
 }

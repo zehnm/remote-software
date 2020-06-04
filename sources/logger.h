@@ -65,16 +65,18 @@ class Logger : public QObject {
     Q_INVOKABLE QJsonObject getInformation();
 
     Q_INVOKABLE int  getFileCount();
-    Q_INVOKABLE void purgeFiles(int purgeHours);
+    // Purge files (-1 : use purgeHours from constructor)
+    Q_INVOKABLE void purgeFiles(int purgeDays = -1);
 
     // path :       directory for log file, if empty no log file
     // logLevel :   default log level
-    // debug :      output to QtCreator DEBUG
+    // console :    output to QtCreator Console
     // showSource : show qDebug ... source and line
     // queueSize :  maximum Queue size
-    // purgeHours : purge at start
+    // purgeHours : purge interval in hours (== 0: don't purge)
+    // prefix :     log file prefix
     explicit Logger(const QString& path, QString logLevel = "DEBUG", bool console = true, bool showSource = false,
-                    int queueSize = 100, int purgeHours = 12, QObject* parent = nullptr);
+                    int queueSize = 100, int purgeDays = 3, QString prefix = "YIO_log_", QObject* parent = nullptr);
     ~Logger();
 
     QtMsgType      logLevel() { return m_logLevel; }
@@ -91,6 +93,7 @@ class Logger : public QObject {
 
     // for use from C++ to register a Logging category
     // used by integrations to register plugin logging
+    // allows to filter logging at the source (QLoggingCategory)
     void defineLogCategory(const QString& category, int level, QLoggingCategory* loggingCategory = nullptr,
                            PluginInterface* plugin = nullptr);
 
@@ -132,16 +135,20 @@ class Logger : public QObject {
     static QtMsgType   s_msgTypeSorted[];  // required because QtMsgType has strange sorting
 
     QHash<QString, SCategory*> m_categories;  // categories
-    QtMsgType                  m_logLevel;    // overall log level
-    quint16          m_logLevelMask;          // overall log level mask, required because QtMsgType has strange sorting
+    QtMsgType                  m_logLevel;    // initial log level
     bool             m_consoleEnabled;        // output to console
     bool             m_fileEnabled;           // output to log file
     bool             m_queueEnabled;          // output to queue for JSON API
     bool             m_showSource;            // Show source file and line
+    int              m_purgeDays;             // Purge last days
     int              m_lastDay;               // Every day we create a new file
     int              m_maxQueueSize;          // Maximum Queue size
     QString          m_directory;             // For files
+    QString          m_prefix;                // Prefix for files
+    QString          m_currentFileName;       // Current file name
     QFile*           m_file;                  // File
+    QTextStream*     m_textStream;            // Text Stream
+    QMutex           m_fileMutex;             // File lock
     QQueue<SMessage> m_queue;                 // Queue
     QMutex           m_queueMutex;            // Locking for queue
 };

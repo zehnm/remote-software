@@ -815,7 +815,7 @@
             "console",
             "showSource",
             "queueSize",
-            "purgeHours"
+            "purgeDays"
           ],
           "properties": {
             "path": {
@@ -862,10 +862,10 @@
               "default": 0,
               "minimum": 0
             },
-            "purgeHours": {
-              "$id": "#/properties/settings/properties/logging/properties/purgeHours",
+            "purgeDays": {
+              "$id": "#/properties/settings/properties/logging/properties/purgeDays",
               "type": "integer",
-              "title": "Purge log files in hours",
+              "title": "Purge log files in days",
               "default": 12,
               "minimum": 0
             }

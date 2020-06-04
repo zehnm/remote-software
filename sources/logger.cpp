@@ -30,16 +30,19 @@ QStringList Logger::s_msgTypeString   = {"DEBUG", "WARN ", "CRIT ", "FATAL", "IN
 QtMsgType   Logger::s_msgTypeSorted[] = {QtDebugMsg, QtInfoMsg, QtWarningMsg, QtCriticalMsg,
                                        QtFatalMsg};  // sorted by severity
 
-Logger::Logger(const QString& path, QString logLevel, bool console, bool showSource, int queueSize, int purgeHours,
-               QObject* parent)
+Logger::Logger(const QString& path, QString logLevel, bool console, bool showSource, int queueSize, int purgeDays,
+               QString prefix, QObject* parent)
     : QObject(parent),
       m_consoleEnabled(console),
       m_fileEnabled(path.length() > 0),
       m_queueEnabled(false),
       m_showSource(showSource),
+      m_purgeDays(purgeDays),
       m_maxQueueSize(queueSize),
       m_directory(path),
-      m_file(nullptr) {
+      m_prefix(prefix),
+      m_file(nullptr),
+      m_textStream(nullptr) {
     s_instance = this;
 
     Q_ASSERT(s_msgTypeString.length() == QtMsgType::QtInfoMsg + 1);
@@ -53,16 +56,21 @@ Logger::Logger(const QString& path, QString logLevel, bool console, bool showSou
     if (!logLevel.isEmpty()) {
         setLogLevel(static_cast<QtMsgType>(toMsgType(logLevel)));
     }
-
-    if (m_fileEnabled) {
-        purgeFiles(purgeHours);
-    }
 }
 Logger::~Logger() {
+    qInstallMessageHandler(nullptr);
+    s_instance = nullptr;
+    m_fileEnabled = m_queueEnabled = m_consoleEnabled = false;
+    if (m_textStream != nullptr) {
+        m_textStream->flush();
+        delete m_textStream;
+        m_textStream = nullptr;
+    }
     if (m_file != nullptr) {
         m_file->close();
+        delete m_file;
+        m_file = nullptr;
     }
-    s_instance = nullptr;
 }
 
 int Logger::toMsgType(const QString& msgType) {
@@ -78,7 +86,6 @@ int Logger::toMsgType(const QString& msgType) {
 void Logger::setLogLevel(int logLevel) {
     QtMsgType level = static_cast<QtMsgType>(logLevel);
     m_logLevel      = level;
-    m_logLevelMask  = logLevelToMask(level);
 }
 
 void Logger::setCategoryLogLevel(const QString& category, int logLevel) {
@@ -154,7 +161,7 @@ void Logger::processMessage(QtMsgType type, const char* category, const char* so
     Q_ASSERT(type <= QtMsgType::QtInfoMsg);
     c->count[type]++;
     // if overall or category specific is enabled
-    if (writeanyHow || !!((m_logLevelMask | c->logLevelMask) & (1 << type))) {
+    if (writeanyHow || !!(c->logLevelMask & (1 << type))) {
         QString sourcePosition;
         if (m_showSource && source != nullptr) {
             sourcePosition = QString("%1:%2").arg(source).arg(line);
@@ -180,16 +187,31 @@ void Logger::messageOutput(::QtMsgType type, const QMessageLogContext& context, 
 }
 
 void Logger::writeFile(const SMessage& message, const QDateTime& dt) {
+    QMutexLocker lock(&m_fileMutex);
     int day = dt.date().day();
     if (day != m_lastDay || m_file == nullptr) {
         m_lastDay = day;
+
+        // Close old file
+        if (m_textStream != nullptr) {
+            m_textStream->flush();
+            delete m_textStream;
+        }
         if (m_file != nullptr) {
             m_file->close();
+            delete m_file;
         }
-        m_file       = new QFile;
-        QString path = QString("%1/%2.log").arg(m_directory, dt.toString("yyyy-MM-dd-hh"));
-        m_file->setFileName(path);
+
+        // Create new file
+        m_currentFileName =  QString("%1%2.log").arg(m_prefix, dt.toString("yyyy-MM-dd"));
+        QString path = QString("%1/%2").arg(m_directory, m_currentFileName);
+        m_file       = new QFile(path);
         m_file->open(QIODevice::Append | QIODevice::Text);
+        m_textStream = new QTextStream(m_file);
+        m_textStream->setCodec("UTF-8");
+
+        // Purge Files
+        purgeFiles ();
     }
     QString msg = QString("%1 %2 %3 %4 %5")
                       .arg(dt.toString("dd.MM.yyyy hh:mm:ss"))
@@ -197,9 +219,7 @@ void Logger::writeFile(const SMessage& message, const QDateTime& dt) {
                       .arg(message.category)
                       .arg(message.message)
                       .arg(message.sourcePosition);
-    QTextStream out(m_file);
-    out.setCodec("UTF-8");
-    out << msg << endl;
+    *m_textStream << msg << endl;
 }
 
 void Logger::writeQueue(const SMessage& message) {
@@ -226,20 +246,33 @@ void Logger::writeInfo(const QString& msg) { processMessage(QtMsgType::QtInfoMsg
 void Logger::writeWarning(const QString& msg) {
     processMessage(QtMsgType::QtWarningMsg, "default", nullptr, 0, msg, true);
 }
-void Logger::purgeFiles(int purgeHours) {
+void Logger::purgeFiles(int purgeDays) {
+    if (purgeDays < 0) {
+        purgeDays = m_purgeDays;                            // Use initial value
+    }
+
+    if (purgeDays <= 0) {
+        return;                                             // Purge disabled
+    }
+
     QDir      dir(m_directory);
     QDateTime dt          = QDateTime::currentDateTime();
-    dt                    = dt.addSecs(-purgeHours * 3600);
-    QStringList fileNames = dir.entryList(QStringList("*.log"), QDir::Files);
+    dt                    = dt.addDays(-purgeDays);
+    QStringList fileNames = dir.entryList(QStringList(m_prefix + "*.log"), QDir::Files);
     int         count     = 0;
+    int         datePos   = m_prefix.length();
     for (QStringList::iterator i = fileNames.begin(); i != fileNames.end(); ++i) {
         try {
-            int idx = i->lastIndexOf('.');
-            if (idx > 0) {
-                QDateTime filedt = QDateTime::fromString(i->left(idx), "yyyy-MM-dd-HH");
-                if (filedt < dt) {
-                    dir.remove(*i);
-                    count++;
+            // Starts with prefix but not current file
+            if (i->compare(m_currentFileName) != 0) {
+                int idx = i->lastIndexOf('.');
+                if (idx > 0) {
+                    QString   filedtstr = i->mid(datePos, idx - datePos);
+                    QDateTime filedt = QDateTime::fromString(filedtstr, "yyyy-MM-dd");
+                    if (filedt < dt) {
+                        dir.remove(*i);
+                        count++;
+                    }
                 }
             }
         } catch (...) {
@@ -252,7 +285,7 @@ void Logger::purgeFiles(int purgeHours) {
 }
 int Logger::getFileCount() {
     QDir        dir(m_directory);
-    QStringList fileNames = dir.entryList(QStringList("*.log"), QDir::Files);
+    QStringList fileNames = dir.entryList(QStringList(m_prefix + "*.log"), QDir::Files);
     return fileNames.length();
 }
 

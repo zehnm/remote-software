@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
     }
     Logger logger(path, logCfg.value("level", "WARN").toString(), logCfg.value("console", true).toBool(),
                   logCfg.value("showSource", true).toBool(), logCfg.value("queueSize", 100).toInt(),
-                  logCfg.value("purgeHours", 72).toInt());
+                  logCfg.value("purgeDays", 3).toInt());
     engine.rootContext()->setContextProperty("logger", &logger);
     Logger::getInstance()->write(QString("YIO App %1").arg(version));
 

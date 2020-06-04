@@ -89,6 +89,14 @@ void Integrations::createInstance(QObject* pluginObj, QVariantMap map) {
     if (interface) {
         connect(interface, &PluginInterface::createDone, this, &Integrations::onCreateDone);
 
+        // Define logger category for plugin, allow logger to call plugin->setLogEnabled
+        Logger* logger = Logger::getInstance();
+        QString category = map.value("type").toString();
+        if (logger != nullptr && category.count() > 0) {                 // category name is plugin type !!
+            int level = logger->toMsgType(map.value("log").toString());  // initial log level
+            logger->defineLogCategory(category, level, nullptr, interface);
+        }
+
         interface->create(map, entities, notifications, api, config);
     }
 }
@@ -145,10 +153,12 @@ void Integrations::onCreateDone(QMap<QObject*, QVariant> map) {
     // add the integrations to the integration database
     for (QMap<QObject*, QVariant>::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
         add(iter.value().toMap(), iter.key(), iter.value().toMap().value("type").toString());
+        /* RIC: shifted to Entities::load
         IntegrationInterface* ii = qobject_cast<IntegrationInterface*>(iter.key());
         if (ii) {
             ii->connect();
         }
+        */
     }
     m_integrationsLoaded++;
 
