@@ -164,22 +164,22 @@ To learn more about the project, visit
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../components/climate/ui/Card.qml" line="416"/>
+        <location filename="../components/climate/ui/Card.qml" line="420"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../components/climate/ui/Card.qml" line="426"/>
+        <location filename="../components/climate/ui/Card.qml" line="430"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../components/climate/ui/Card.qml" line="432"/>
+        <location filename="../components/climate/ui/Card.qml" line="436"/>
         <source>Heat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../components/climate/ui/Card.qml" line="438"/>
+        <location filename="../components/climate/ui/Card.qml" line="442"/>
         <source>Cool</source>
         <translation type="unfinished"></translation>
     </message>
@@ -774,59 +774,59 @@ Navigate your internet browser to: http://</source>
 <context>
     <name>Settings</name>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="93"/>
-        <location filename="../basic_ui/pages/Settings.qml" line="106"/>
-        <location filename="../basic_ui/pages/Settings.qml" line="162"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="98"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="111"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="167"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="173"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="178"/>
         <source>New software is available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="173"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="178"/>
         <source>Your software is up to date.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="190"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="195"/>
         <source>Display</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="196"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="201"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="209"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="214"/>
         <source>Integrations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="216"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="221"/>
         <source>Battery &amp; power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="223"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="228"/>
         <source>m remaining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="230"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="235"/>
         <source>WiFi &amp; bluetooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="236"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="241"/>
         <source>System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/pages/Settings.qml" line="242"/>
+        <location filename="../basic_ui/pages/Settings.qml" line="247"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1196,32 +1196,37 @@ YIO remote %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="186"/>
+        <location filename="../basic_ui/settings/System.qml" line="188"/>
+        <source>24-hour clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../basic_ui/settings/System.qml" line="218"/>
         <source>Uptime</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="214"/>
+        <location filename="../basic_ui/settings/System.qml" line="246"/>
         <source>CPU temperature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="241"/>
+        <location filename="../basic_ui/settings/System.qml" line="273"/>
         <source>CPU load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="267"/>
+        <location filename="../basic_ui/settings/System.qml" line="299"/>
         <source>Used memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="291"/>
+        <location filename="../basic_ui/settings/System.qml" line="323"/>
         <source>Reboot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basic_ui/settings/System.qml" line="305"/>
+        <location filename="../basic_ui/settings/System.qml" line="337"/>
         <source>Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
