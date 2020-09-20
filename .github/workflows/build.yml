@@ -24,8 +24,7 @@
           config:
           - {
               name: "remote-os v0.x Build", artifact: "RPi0-release",
-              qmake-args: "CONFIG+=release",
-              crosscompile-action: "zehnm/yio-crosscompile-action@v1.1.0"
+              qmake-args: "CONFIG+=release"
             }
   
       steps:
@@ -53,7 +52,7 @@
   
         - name: Cross compile
           id: cross-compile
-          uses: ${{ matrix.config.crosscompile-action }}
+          uses: zehnm/yio-crosscompile-action@v1.1.0
           with:
             project-name: ${{ env.PROJECT_NAME }}
             output-path: ${GITHUB_WORKSPACE}/binaries/app
