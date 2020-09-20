@@ -23,7 +23,7 @@
         matrix:
           config:
           - {
-              name: "remote-os v0.x Build", artifact: "${{ env.APP_ARCHITECTURE }}-release",
+              name: "remote-os v0.x Build", artifact: "RPi0-release",
               qmake-args: "CONFIG+=release",
               crosscompile-action: "zehnm/yio-crosscompile-action@v1.1.0"
             }
