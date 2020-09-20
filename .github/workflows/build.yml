@@ -54,9 +54,9 @@
         - name: Set build timestamp
           run: echo "::set-env name=TIMESTAMP::$(date +"%Y%m%d_%H%M%S")"
   
-        - name: Cross compile
+        - name: Cross compile remote-os v0.x
           id: cross-compile
-          uses: zehnm/yio-crosscompile-action@master
+          uses: zehnm/yio-crosscompile-action@1.1.0
           with:
             project-name: ${{ env.PROJECT_NAME }}
             output-path: ${GITHUB_WORKSPACE}/binaries/app
