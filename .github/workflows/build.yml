@@ -24,12 +24,12 @@
         matrix:
           config:
           - {
-              name: "remote-os v0.x Build", artifact: ${{ env.APP_SUFFIX1 }},
+              name: "remote-os v0.x Build", artifact: "${{ env.APP_SUFFIX1 }}",
               qmake-args: "CONFIG+=release",
               build-image: "zehnm/yio-crosscompile-action:1.1.0"
             }
           - {
-              name: "remote-os v1.x Build", artifact: ${{ env.APP_SUFFIX2 }},
+              name: "remote-os v1.x Build", artifact: "${{ env.APP_SUFFIX2 }}",
               qmake-args: "CONFIG+=release",
               build-image: "zehnm/yio-crosscompile-action:2.0.0"
             }
