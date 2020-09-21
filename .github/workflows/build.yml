@@ -52,7 +52,7 @@
   
         - name: Cross compile
           id: cross-compile
-          uses: zehnm/yio-crosscompile-action@v1.1.0
+          uses: zehnm/yio-crosscompile-action@test
           with:
             project-name: ${{ env.PROJECT_NAME }}
             output-path: ${GITHUB_WORKSPACE}/binaries/app
