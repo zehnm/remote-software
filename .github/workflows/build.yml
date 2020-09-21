@@ -52,7 +52,7 @@
   
         - name: Cross compile
           id: cross-compile
-          uses: zehnm/yio-crosscompile-action@test
+          uses: zehnm/yio-crosscompile-action@dynamic-docker-image
           with:
             project-name: ${{ env.PROJECT_NAME }}
             output-path: ${GITHUB_WORKSPACE}/binaries/app
