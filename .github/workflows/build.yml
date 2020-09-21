@@ -22,8 +22,13 @@
       strategy:
         matrix:
           config:
-          - {
-              name: "remote-os v1.x Build", artifact: "RPi0-release",
+            - {
+                name: "remote-os v0.x Build", artifact: "RPi0-release",
+                qmake-args: "CONFIG+=release",
+                build-image: "zehnm/yio-crosscompile-action:1.1.0"
+              }
+            - {
+              name: "remote-os v1.x Build", artifact: "RPi0-Qt5.12.8",
               qmake-args: "CONFIG+=release",
               build-image: "zehnm/yio-crosscompile-action:2.0.0"
             }
