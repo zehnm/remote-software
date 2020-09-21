@@ -33,7 +33,7 @@
               qmake-args: "CONFIG+=release",
               build-image: "zehnm/yio-crosscompile-action:2.0.0"
             }
-  
+
       steps:  
         - name: Checkout ${{ env.PROJECT_NAME}}
           uses: actions/checkout@v2
