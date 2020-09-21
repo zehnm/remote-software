@@ -64,7 +64,14 @@
         - name: Cross compile
           run: |
               docker pull ${{ matrix.config.build-image }}
-              docker run --workdir /github/workspace --rm -e APP_NAME -e APP_ARCHITECTURE -e PROJECT_NAME -e HASH_FILENAME -e TIMESTAMP -e INPUT_PROJECT-NAME -e INPUT_OUTPUT-PATH -e INPUT_QMAKE-ARGS -e INPUT_INTG-LIB-REPO -e INPUT_VERSION-FILE-DIR -e HOME -e GITHUB_JOB -e GITHUB_REF -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_REPOSITORY_OWNER -e GITHUB_RUN_ID -e GITHUB_RUN_NUMBER -e GITHUB_ACTOR -e GITHUB_WORKFLOW -e GITHUB_HEAD_REF -e GITHUB_BASE_REF -e GITHUB_EVENT_NAME -e GITHUB_SERVER_URL -e GITHUB_API_URL -e GITHUB_GRAPHQL_URL -e GITHUB_WORKSPACE -e GITHUB_ACTION -e GITHUB_EVENT_PATH -e GITHUB_PATH -e GITHUB_ENV -e RUNNER_OS -e RUNNER_TOOL_CACHE -e RUNNER_TEMP -e RUNNER_WORKSPACE -e ACTIONS_RUNTIME_URL -e ACTIONS_RUNTIME_TOKEN -e ACTIONS_CACHE_URL -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/remote-software/remote-software":"/github/workspace" ${{ matrix.config.build-image }}  "remote-software" "${GITHUB_WORKSPACE}/binaries/app" "CONFIG+=release" "https://github.com/YIO-Remote/integrations.library.git" "."
+              docker run --workdir /github/workspace --rm -e APP_NAME -e APP_ARCHITECTURE -e PROJECT_NAME -e HASH_FILENAME -e TIMESTAMP -e INPUT_PROJECT-NAME -e INPUT_OUTPUT-PATH -e INPUT_QMAKE-ARGS -e INPUT_INTG-LIB-REPO -e INPUT_VERSION-FILE-DIR -e HOME -e GITHUB_JOB -e GITHUB_REF -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_REPOSITORY_OWNER -e GITHUB_RUN_ID -e GITHUB_RUN_NUMBER -e GITHUB_ACTOR -e GITHUB_WORKFLOW -e GITHUB_HEAD_REF -e GITHUB_BASE_REF -e GITHUB_EVENT_NAME -e GITHUB_SERVER_URL -e GITHUB_API_URL -e GITHUB_GRAPHQL_URL \
+                  -e GITHUB_WORKSPACE=/github/workspace -e GITHUB_ACTION -e GITHUB_EVENT_PATH -e GITHUB_PATH -e GITHUB_ENV -e RUNNER_OS -e RUNNER_TOOL_CACHE -e RUNNER_TEMP -e RUNNER_WORKSPACE -e ACTIONS_RUNTIME_URL -e ACTIONS_RUNTIME_TOKEN -e ACTIONS_CACHE_URL -e GITHUB_ACTIONS=true -e CI=true \
+                  -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                  -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                  -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                  -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                  -v "/home/runner/work/remote-software/remote-software":"/github/workspace" \
+                  ${{ matrix.config.build-image }}  "remote-software" "/github/workspace/binaries/app" "CONFIG+=release" "https://github.com/YIO-Remote/integrations.library.git" "."
 
         - name: Upload build artefacts
           uses: actions/upload-artifact@v1
