@@ -38,6 +38,7 @@
           with:
             # History of 500 should be more than enough to calculate commit count since last release tag.
             fetch-depth: 500
+            # Check out into sub folder, we also need the integrations.library at the same level!
             path: ${{ env.PROJECT_NAME}}
 
         - name: Fetch all tags to determine version
@@ -61,8 +62,8 @@
               docker pull ${{ matrix.config.build-image }}
               docker run --workdir /github/workspace --rm  \
                   -e GITHUB_WORKSPACE=/github/workspace \
-                  -v /home/runner/work/remote-software/remote-software:/github/workspace \
-                  ${{ matrix.config.build-image }} remote-software /github/workspace/binaries/app ${{ matrix.config.qmake-args }} https://github.com/YIO-Remote/integrations.library.git .
+                  -v /home/runner/work/${{ env.PROJECT_NAME}}/${{ env.PROJECT_NAME}}:/github/workspace \
+                  ${{ matrix.config.build-image }} ${{ env.PROJECT_NAME}} /github/workspace/binaries/app ${{ matrix.config.qmake-args }} https://github.com/YIO-Remote/integrations.library.git .
 
         - name: Get artifact version
           run: |
